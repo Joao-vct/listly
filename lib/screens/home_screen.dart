@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../models/lista_compra.dart';
+import '../services/auth_service.dart';
 import 'detalhes_lista_screen.dart';
 import 'nova_lista_screen.dart';
 
@@ -12,6 +13,8 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  final AuthService _authService = AuthService();
+
   final List<ListaCompra> listas = [
     ListaCompra(
       id: '1',
@@ -67,10 +70,25 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  // Encerra a sessão do usuário no Firebase.
+  Future<void> _sair() async {
+    await _authService.sair();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Minhas listas'), centerTitle: true),
+      appBar: AppBar(
+        title: const Text('Minhas listas'),
+        centerTitle: true,
+        actions: [
+          IconButton(
+            onPressed: _sair,
+            tooltip: 'Sair',
+            icon: const Icon(Icons.logout),
+          ),
+        ],
+      ),
 
       body: ListView.builder(
         padding: const EdgeInsets.all(16),
