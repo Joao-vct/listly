@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
 
+import '../models/lista_compra.dart';
+
 class NovaListaScreen extends StatefulWidget {
-  const NovaListaScreen({super.key});
+  final ListaCompra? lista;
+
+  const NovaListaScreen({super.key, this.lista});
 
   @override
   State<NovaListaScreen> createState() => _NovaListaScreenState();
@@ -12,6 +16,20 @@ class _NovaListaScreenState extends State<NovaListaScreen> {
 
   final _nomeController = TextEditingController();
   final _descricaoController = TextEditingController();
+
+  // Verifica se estamos editando uma lista existente.
+  bool get _editando => widget.lista != null;
+
+  @override
+  void initState() {
+    super.initState();
+
+    // Preenche os campos quando a tela é aberta para edição.
+    if (_editando) {
+      _nomeController.text = widget.lista!.nome;
+      _descricaoController.text = widget.lista!.descricao;
+    }
+  }
 
   @override
   void dispose() {
@@ -32,7 +50,11 @@ class _NovaListaScreenState extends State<NovaListaScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Nova lista'), centerTitle: true),
+      appBar: AppBar(
+        title: Text(_editando ? 'Editar lista' : 'Nova lista'),
+        centerTitle: true,
+      ),
+
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20),
         child: Form(
@@ -40,16 +62,22 @@ class _NovaListaScreenState extends State<NovaListaScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              const Icon(
-                Icons.playlist_add,
+              Icon(
+                _editando ? Icons.edit_note : Icons.playlist_add,
                 size: 70,
-                color: Color(0xFF5DE0B0),
+                color: const Color(0xFF5DE0B0),
               ),
+
               const SizedBox(height: 20),
 
-              const Text(
-                'Crie sua lista de compras',
-                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+              Text(
+                _editando
+                    ? 'Edite sua lista de compras'
+                    : 'Crie sua lista de compras',
+                style: const TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                ),
                 textAlign: TextAlign.center,
               ),
 
@@ -67,6 +95,7 @@ class _NovaListaScreenState extends State<NovaListaScreen> {
                   if (valor == null || valor.trim().isEmpty) {
                     return 'Digite o nome da lista';
                   }
+
                   return null;
                 },
               ),
@@ -88,8 +117,8 @@ class _NovaListaScreenState extends State<NovaListaScreen> {
 
               ElevatedButton.icon(
                 onPressed: _salvarLista,
-                icon: const Icon(Icons.check),
-                label: const Text('Salvar lista'),
+                icon: Icon(_editando ? Icons.save : Icons.check),
+                label: Text(_editando ? 'Salvar alterações' : 'Salvar lista'),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF5DE0B0),
                   foregroundColor: Colors.black,
